@@ -2,15 +2,12 @@ pipeline {
     agent any
     
     triggers {
-        // Poll SCM every 30 seconds
+        // Poll SCM every 1 minute (minimum supported)
         pollSCM('* * * * *')
     }
     
     options {
-        // Keep last 10 builds
         buildDiscarder(logRotator(numToKeepStr: '10'))
-        
-        // Timeout after 1 hour
         timeout(time: 1, unit: 'HOURS')
     }
     
@@ -22,74 +19,60 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                script {
-                    echo 'Checking out code from repository...'
-                    checkout scm
-                }
+                echo 'Checking out code from repository...'
+                checkout scm
             }
         }
         
         stage('Build Backend') {
             steps {
-                script {
-                    echo 'Building backend...'
-                    dir('backend') {
-                        sh 'npm install'
-                        sh 'npm run build || echo "No build script defined"'
-                    }
+                echo 'Building backend...'
+                dir('backend') {
+                    bat 'npm install'
+                    bat 'npm run build || echo No build script defined'
                 }
             }
         }
         
         stage('Build Frontend') {
             steps {
-                script {
-                    echo 'Building frontend...'
-                    dir('frontend') {
-                        sh 'npm install'
-                        sh 'npm run build'
-                    }
+                echo 'Building frontend...'
+                dir('frontend') {
+                    bat 'npm install'
+                    bat 'npm run build'
                 }
             }
         }
         
         stage('Test Backend') {
             steps {
-                script {
-                    echo 'Testing backend...'
-                    dir('backend') {
-                        sh 'npm test || echo "No tests defined"'
-                    }
+                echo 'Testing backend...'
+                dir('backend') {
+                    bat 'npm test || echo No tests defined'
                 }
             }
         }
         
         stage('Test Frontend') {
             steps {
-                script {
-                    echo 'Testing frontend...'
-                    dir('frontend') {
-                        sh 'npm test || echo "No tests defined"'
-                    }
+                echo 'Testing frontend...'
+                dir('frontend') {
+                    bat 'npm test || echo No tests defined'
                 }
             }
         }
         
         stage('Docker Build & Push') {
             steps {
-                script {
-                    echo 'Building Docker images...'
-                    sh 'docker-compose build'
-                }
+                echo 'Building Docker images...'
+                bat 'docker-compose build'
             }
         }
         
         stage('Deploy') {
             steps {
-                script {
-                    echo 'Deploying application...'
-                    sh 'docker-compose up -d'
-                }
+                echo 'Deploying application...'
+                bat 'docker-compose up -d'
             }
         }
     }
