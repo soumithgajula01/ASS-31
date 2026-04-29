@@ -1,10 +1,12 @@
 pipeline {
     agent any
     
-    options {
+    triggers {
         // Poll SCM every 30 seconds
         pollSCM('H/0.5 * * * *')
-        
+    }
+    
+    options {
         // Keep last 10 builds
         buildDiscarder(logRotator(numToKeepStr: '10'))
         
