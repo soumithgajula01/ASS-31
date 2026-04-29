@@ -2,8 +2,8 @@ pipeline {
     agent any
     
     triggers {
-        // Poll SCM every 1 minute (minimum supported)
-        pollSCM('* * * * *')
+        // Better for performance
+        pollSCM('H/5 * * * *')
     }
     
     options {
@@ -29,7 +29,13 @@ pipeline {
                 echo 'Building backend...'
                 dir('backend') {
                     bat 'npm install'
-                    bat 'npm run build || echo No build script defined'
+                    bat '''
+                    npm run build
+                    IF %ERRORLEVEL% NEQ 0 (
+                        echo No build script defined
+                        exit /b 0
+                    )
+                    '''
                 }
             }
         }
@@ -48,7 +54,13 @@ pipeline {
             steps {
                 echo 'Testing backend...'
                 dir('backend') {
-                    bat 'npm test || echo No tests defined'
+                    bat '''
+                    npm test
+                    IF %ERRORLEVEL% NEQ 0 (
+                        echo No tests defined
+                        exit /b 0
+                    )
+                    '''
                 }
             }
         }
@@ -57,7 +69,13 @@ pipeline {
             steps {
                 echo 'Testing frontend...'
                 dir('frontend') {
-                    bat 'npm test || echo No tests defined'
+                    bat '''
+                    npm test
+                    IF %ERRORLEVEL% NEQ 0 (
+                        echo No tests defined
+                        exit /b 0
+                    )
+                    '''
                 }
             }
         }
@@ -65,14 +83,14 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 echo 'Building Docker images...'
-                bat 'docker-compose build'
+                bat 'docker compose build'
             }
         }
         
         stage('Deploy') {
             steps {
                 echo 'Deploying application...'
-                bat 'docker-compose up -d'
+                bat 'docker compose up -d'
             }
         }
     }
