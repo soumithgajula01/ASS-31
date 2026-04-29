@@ -3,7 +3,7 @@ pipeline {
     
     triggers {
         // Poll SCM every 30 seconds
-        pollSCM('H/0.5 * * * *')
+        pollSCM('* * * * *')
     }
     
     options {
