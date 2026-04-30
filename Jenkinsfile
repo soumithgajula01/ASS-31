@@ -1,12 +1,11 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Clone Repo') {
-            steps {
-                git 'https://github.com/soumithgajula01/ASS-31'
-            }
-        }
+    stage('Clone Repo') {
+    steps {
+        git branch: 'main', url: 'https://github.com/soumithgajula01/ASS-31'
+    }
+}
 
         stage('Build Backend') {
             steps {
