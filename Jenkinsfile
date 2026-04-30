@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     stages {
+
         stage('Clone Repo') {
             steps {
                 git branch: 'main', url: 'https://github.com/soumithgajula01/ASS-31'
@@ -34,10 +35,21 @@ pipeline {
 
         stage('Deploy') {
             steps {
+                // Stop and remove old containers
                 bat 'docker compose down --remove-orphans'
-                bat 'docker rm -f mongodb || echo no-container'
-                bat 'docker compose up -d'
+
+                // Force recreate everything (fixes container name conflict)
+                bat 'docker compose up -d --build --force-recreate'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment Successful!'
+        }
+        failure {
+            echo 'Deployment Failed!'
         }
     }
 }
