@@ -35,10 +35,15 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // Stop and remove old containers
+                // Stop and remove compose containers
                 bat 'docker compose down --remove-orphans'
 
-                // Force recreate everything (fixes container name conflict)
+                // 🔥 Remove ANY existing conflicting containers (important fix)
+                bat 'docker rm -f backend || echo backend-not-found'
+                bat 'docker rm -f frontend || echo frontend-not-found'
+                bat 'docker rm -f mongodb || echo mongodb-not-found'
+
+                // Start fresh containers
                 bat 'docker compose up -d --build --force-recreate'
             }
         }
